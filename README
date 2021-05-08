@@ -1,0 +1,19 @@
+TERMatrix 0.2
+Copyright 2006 Flavio Chierichetti
+TERMatrix is free software released under the GNU GPL 2
+
+This little software emulates "The Matrix" on your VT-100 compatible terminal 8^)
+
+It has been tested on GNU/Linux.
+
+To compile, just type ``make''.
+To enter the matrix, just type ``./termatrix''.
+To end it, just press CTRL-c .
+
+TERMatrix can be downloaded from http://lightless.org/other
+The author can be contacted at flavio -AT- lightless -DOT- org
+
+--
+
+"The Matrix" is a movie from Warner Bros. Inc.
+Warner Bros. Inc. isn't affiliated in any way with TERMatrix
