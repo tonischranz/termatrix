@@ -16,6 +16,7 @@
 #include <sys/ioctl.h>
 
 #define TERMINAL_DEVICE "/dev/tty"
+#define BS 1024
 
 #define min(x, y) ((x) < (y) ? (x) : (y))
 
@@ -47,6 +48,11 @@ char *V = "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz<>()[]{
 int Length, R, C;
 seq **S;
 
+char buf[BS];
+
+int ofw, ofr;
+char pipein, ch;
+
 char *quotes[] = {
   "Wake up, Neo.",
   "There is no spoon.",
@@ -66,13 +72,47 @@ int main() {
   srand(time(NULL) % RAND_MAX);
 
   Length = strlen(V);
+  pipein = !isatty(STDIN_FILENO);
 
   initSigActions();
 
   while (1)
-    pause();
+  {
+    if (pipein && buf[ofw] == 0)
+    {
+      if (read(STDIN_FILENO, &ch, 1))
+      {
+        if (ch < 0) ch *= -1;
+        if (ch >= 0 && ch < 32) ch += 32;
+        if (ch == 127) ch -= 1;
+        buf[ofw] = ch;
+        ofw++;
+        ofw %= BS;
+      }      
+    }
+    else pause();
+  }
 
   return 0;
+}
+
+char get_char()
+{
+  char co;
+
+  if (pipein)
+  {
+    if (buf[ofr] != 0)
+    {
+      co = buf[ofr];
+      buf[ofr] = 0;
+      ofr++;
+      ofr %= BS;
+      return co;
+    } 
+    else return ' ';
+  }
+  else return V[rand() % Length];  
 }
 
 void initTerm(int signum) {
@@ -142,7 +182,7 @@ void print(int signum) {
 	      termSetAttr(green, black, normalAttr);
 	    
 	    termMoveTo(r, c);
-	    termPutChar(V[rand() % Length]);
+	    termPutChar(get_char());
 	  }
 
 	if ( S[c]->end == R )
@@ -156,12 +196,12 @@ void print(int signum) {
 	}
 	
 	if ( S[c]->end < R ) {
-	  S[c]->last = V[rand() % Length];
+      S[c]->last = get_char();
 
-	  termSetAttr(white, black, normalAttr);
-	  termMoveTo(S[c]->end, c);
-	  termPutChar(S[c]->last);
-	  
+	    termSetAttr(white, black, normalAttr);
+	    termMoveTo(S[c]->end, c);
+	    termPutChar(S[c]->last);
+    	  
 	  S[c]->end++;
 	}
 	
