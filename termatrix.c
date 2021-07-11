@@ -22,7 +22,6 @@
 
 #define termCursorOff() printf("\x1b[?25l");
 #define termMoveTo(r, c) printf("\x1b[%d;%dH", r + 1, c + 1)
-//#define termSetAttr(fore, back, attr) printf("\x1b[%d;%d;%dm", attr, fore + 30, back + 40)
 #define termSetAttr(fore, back, attr) printf("\x1b[%d;%dm", attr, fore + 30)
 #define termPutChar(c) printf("%c", c)
 #define termErase() printf("\x1b[2J")
@@ -51,7 +50,7 @@ seq **S;
 char buf[BS];
 
 int ofw, ofr;
-char pipein, ch;
+char pipein;
 
 char *quotes[] = {
   "Wake up, Neo.",
@@ -78,7 +77,8 @@ int main() {
 
   while (1)
   {
-    if (pipein && buf[ofw] == 0)
+    char ch = 0;
+    if (pipein)
     {
       if (read(STDIN_FILENO, &ch, 1))
       {
@@ -88,7 +88,7 @@ int main() {
         buf[ofw] = ch;
         ofw++;
         ofw %= BS;
-      }      
+      } 
     }
     else pause();
   }
@@ -171,59 +171,67 @@ void print(int signum) {
   int c, r;
 
   for ( c = 0 ; c < C ; c++ )
-    if ( S[c] ) {
+    if ( S[c] ) 
+    {
       S[c]->counter = (S[c]->counter + 1) % S[c]->speed;
-      if ( S[c]->counter == 0 ) {
-	for ( r = S[c]->start ; r < min(R, S[c]->end) ; r++ ) 
-	  if ( rand() % 100 < letterChangeProb || r == S[c]->end - 1 ) {
-	    if ( rand() % 100 < darkProb )
-	      termSetAttr(green, black, boldAttr);
-	    else
-	      termSetAttr(green, black, normalAttr);
-	    
-	    termMoveTo(r, c);
-	    termPutChar(get_char());
-	  }
+      
+      if ( S[c]->counter == 0 ) 
+      {
+        for ( r = S[c]->start ; r < min(R, S[c]->end) ; r++ ) 
+          if ( rand() % 100 < letterChangeProb || r == S[c]->end - 1 ) 
+          {
+            if ( rand() % 100 < darkProb )
+              termSetAttr(green, black, boldAttr);
+            else
+              termSetAttr(green, black, normalAttr);
+            
+            termMoveTo(r, c);
+            termPutChar(get_char());
+	        }
 
-	if ( S[c]->end == R )
-	  S[c]->end++;
+        if ( S[c]->end == R )
+          S[c]->end++;
 
-	if ( S[c]->n == 0 ) {
-	  termMoveTo(S[c]->start, c);
-	  termPutChar(' ');
-	  
-	  S[c]->start++;
-	}
+        if ( S[c]->n == 0 ) 
+        {
+          termMoveTo(S[c]->start, c);
+          termPutChar(' ');
+          
+          S[c]->start++;
+        }
 	
-	if ( S[c]->end < R ) {
-      S[c]->last = get_char();
+        if ( S[c]->end < R ) 
+        {
+          S[c]->last = get_char();
 
-	    termSetAttr(white, black, normalAttr);
-	    termMoveTo(S[c]->end, c);
-	    termPutChar(S[c]->last);
-    	  
-	  S[c]->end++;
-	}
+          termSetAttr(white, black, normalAttr);
+          termMoveTo(S[c]->end, c);
+          termPutChar(S[c]->last);
+              
+          S[c]->end++;
+        }
 	
-	if ( S[c]->n > 0 )
-	  S[c]->n--;
+	      if ( S[c]->n > 0 )
+	        S[c]->n--;
 
-	if ( S[c]->start == S[c]->end ) {
-	  free(S[c]);
-	  S[c] = NULL;
-	}
+	      if ( S[c]->start == S[c]->end ) 
+        {
+	        free(S[c]); 
+          S[c] = NULL;
+      	}
       }
     } else
-      if ( rand() % 100 < newSeqProb ) {
-	S[c] = (seq*) malloc ( sizeof(seq) );
+      if ( rand() % 100 < newSeqProb ) 
+      {
+        S[c] = (seq*) malloc ( sizeof(seq) );
 
-	S[c]->start = 0;
-	S[c]->end = 0;
-	S[c]->speed = rand() % (speedMax - speedMin + 1) + speedMin;
-	S[c]->counter = 0;
-	S[c]->n = rand() % R + 1;
-	
-	S[c]->last = 0;
+        S[c]->start = 0;
+        S[c]->end = 0;
+        S[c]->speed = rand() % (speedMax - speedMin + 1) + speedMin;
+        S[c]->counter = 0;
+        S[c]->n = rand() % R + 1;
+        
+        S[c]->last = 0;
       }
 
   fflush(stdout);
