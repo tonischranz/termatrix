@@ -16,7 +16,7 @@
 #include <sys/ioctl.h>
 
 #define TERMINAL_DEVICE "/dev/tty"
-#define BS 1024
+#define BS 102400
 
 #define min(x, y) ((x) < (y) ? (x) : (y))
 
