@@ -33,7 +33,7 @@ typedef struct s {
   struct s *next;
 } seq;
 
-enum { usecDelay = 8000, speedMin = 3 , speedMax = 8 , darkProb = 75 , newSeqProb = 20 , letterChangeProb = 25 };
+enum { usecDelay = 8000, speedMin = 6, speedMax = 16 , darkProb = 75 , newSeqProb = 20 , letterChangeProb = 25 };
 
 enum { black = 0, red, green, yellow, blue, magenta, cyan, white };
 enum { normalAttr = 1 , boldAttr = 22 };
