@@ -80,7 +80,8 @@ int main() {
     char ch = 0;
     if (pipein)
     {
-      if (read(STDIN_FILENO, &ch, 1))
+      int s = read(STDIN_FILENO, &ch, 1);
+      if (s > 0)
       {
         if (ch < 0) ch *= -1;
         if (ch >= 0 && ch < 32) ch += 32;
@@ -88,7 +89,14 @@ int main() {
         buf[ofw] = ch;
         ofw++;
         ofw %= BS;
-      } 
+      }
+      else if (s == 0)
+      {
+        termCursorOff();
+        termErase();
+        end(0);
+        break; 
+      }
     }
     else pause();
   }
