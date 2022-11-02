@@ -147,7 +147,7 @@ void initTerm(int signum) {
     S[i] = NULL;
 
   termCursorOff();
-  //termSetAttr(green, black, normalAttr);
+  termSetAttr(green, black, normalAttr);
   //termSetAttr(red, black, normalAttr);
   termErase();
 }
@@ -192,8 +192,8 @@ void print(int signum) {
             if ( rand() % 100 < darkProb )
               termSetAttr(green, black, boldAttr);
             else
-              termSetAttr(red + (rand() % 7), black, normalAttr);
-              //termSetAttr(yellow, black, normalAttr);
+              //termSetAttr(red + (rand() % 7), black, normalAttr);
+              termSetAttr(green, black, normalAttr);
             
             termMoveTo(r, c);
             termPutChar(get_char());
